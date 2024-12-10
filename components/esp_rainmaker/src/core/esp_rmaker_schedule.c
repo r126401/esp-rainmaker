@@ -22,66 +22,14 @@
 #include <esp_rmaker_schedule.h>
 #include <esp_schedule.h>
 
-#define MAX_ID_LEN 8
-#define MAX_NAME_LEN 32
+//#define MAX_ID_LEN 8
+//#define MAX_NAME_LEN 32
 #define MAX_INFO_LEN 128
 #define MAX_OPERATION_LEN 10
 #define TIME_SYNC_DELAY 10          /* 10 seconds */
 #define MAX_SCHEDULES CONFIG_ESP_RMAKER_SCHEDULING_MAX_SCHEDULES
 
 static const char *TAG = "esp_rmaker_schedule";
-
-typedef enum trigger_type {
-    TRIGGER_TYPE_INVALID = 0,
-    TRIGGER_TYPE_DAYS_OF_WEEK,
-    TRIGGER_TYPE_DATE,
-    TRIGGER_TYPE_RELATIVE,
-} trigger_type_t;
-
-typedef struct esp_rmaker_schedule_trigger {
-    trigger_type_t type;
-    /* Relative Seconds */
-    int relative_seconds;
-    /* Minutes from 12am */
-    uint16_t minutes;
-    struct {
-        /* 'OR' list of days or the week. Eg. Monday = 0b1, Tuesday = 0b10 */
-        uint8_t repeat_days;
-    } day;
-    struct {
-        /* Day of the month */
-        uint8_t day;
-        /* 'OR' list of months of the year. Eg. January = 0b1, February = 0b10.
-        0 for next date (either this month or next). */
-        uint16_t repeat_months;
-        uint16_t year;
-        bool repeat_every_year;
-    } date;
-    /* Used for non repeating schedules */
-    int64_t next_timestamp;
-} esp_rmaker_schedule_trigger_t;
-
-typedef struct esp_rmaker_schedule_action {
-    void *data;
-    size_t data_len;
-} esp_rmaker_schedule_action_t;
-
-typedef struct esp_rmaker_schedule {
-    char name[MAX_NAME_LEN + 1];        /* +1 for NULL termination */
-    char id[MAX_ID_LEN + 1];            /* +1 for NULL termination */
-    /* Info is used to store additional information, it is limited to 128 bytes. */
-    char *info;
-    /* Index is used in the callback to get back the schedule. */
-    long index;
-    /* Flags are used to identify the schedule. Eg. timing, countdown */
-    uint32_t flags;
-    bool enabled;
-    esp_schedule_handle_t handle;
-    esp_rmaker_schedule_action_t action;
-    esp_rmaker_schedule_trigger_t trigger;
-    esp_schedule_validity_t validity;
-    struct esp_rmaker_schedule *next;
-} esp_rmaker_schedule_t;
 
 enum time_sync_state {
     TIME_SYNC_NOT_STARTED,
@@ -980,4 +928,12 @@ esp_err_t esp_rmaker_schedule_enable(void)
     }
     ESP_LOGD(TAG, "Scheduling Service Enabled");
     return err;
+}
+
+
+
+esp_rmaker_schedule_t* esp_rmaker_get_schedule_list(void) {
+
+    return schedule_priv_data->schedule_list;
+
 }

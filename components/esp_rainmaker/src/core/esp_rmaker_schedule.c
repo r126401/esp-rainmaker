@@ -934,6 +934,13 @@ esp_err_t esp_rmaker_schedule_enable(void)
 
 esp_rmaker_schedule_t* esp_rmaker_get_schedule_list(void) {
 
-    return schedule_priv_data->schedule_list;
+    if (schedule_priv_data == NULL) return NULL;
+    if (schedule_priv_data->time_sync_state == TIME_SYNC_DONE) {
+        return schedule_priv_data->schedule_list;
 
+    } else {
+        ESP_LOGE(TAG, "time not sync yet");
+        return NULL;
+    }
+    
 }
